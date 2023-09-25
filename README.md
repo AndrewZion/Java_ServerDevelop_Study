@@ -1,2 +1,6 @@
-# Java_ServerDevelop_Study
-Java后端学习笔记代码
+# Java后端开发学习
+## 本仓库存放Java后端开发学习的代码和笔记
+
+### JavaSE
+
+==**对应视频：韩顺平零基础学Java**==
