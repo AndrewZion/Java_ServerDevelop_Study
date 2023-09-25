@@ -1,14 +1,6 @@
-# Java_ServerDevelop_Study
-## JavaSE笔记代码
+# Java后端开发学习
+## 本仓库存放Java后端开发学习的代码和笔记
 
-## Java后端学习笔记代码
-### 韩顺平教育
+### JavaSE
 
-### XJTU
-
-### hspedu
-
-
-
-
-
+==**对应视频：韩顺平零基础学Java**==
