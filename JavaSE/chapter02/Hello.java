@@ -1,5 +1,5 @@
 
-//第一个Java程序
+//绗竴涓狫ava绋嬪簭
 
 // public class Hello {
 // 	public static void main(String[] args) {
@@ -7,20 +7,14 @@
 // 	}
 // }
 
+import java.util.LinkedList;
+
 public class Hello {
 	public static void main(String[] args) {
-		System.out.println("谢利博 is studying Java!");
-	}
-}
-
-class dog {
-	public static void main(String[] args) {
-		System.out.println("Hello,小狗狗!");
-	}
-}
-
-class tiger {
-	public static void main(String[] args) {
-		System.out.println("Hello,小老虎!");
+		LinkedList<Character> path = new LinkedList<>();
+		path.add('a');
+		path.add('e');
+		String temp = path.toString();
+		System.out.println(temp);
 	}
 }
