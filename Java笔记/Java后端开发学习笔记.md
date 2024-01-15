@@ -3039,6 +3039,58 @@ final 可以修饰类、属性、方法和局部变量
 - 当功能内部一部分实现是确定，一部分实现是不确定的。这时可以把不确定的部分暴露出去，让子类去实现
 - 编写一个抽象父类，父类提供了多个子类的通用方法，并把一个或多个方法留给其子类实现，就是一种模板模式
 
+*示例代码如下：*
+
+```java
+package com.hspedu.abstract_;
+
+public abstract class Template {
+	public abstract void job();
+
+	public void calculateTime() {
+		long start = System.currentTimeMillis();
+		job();
+		long end = System.currentTimeMillis();
+		System.out.println("任务执行时间 " + (end - start));
+	}
+}
+
+package com.hspedu.abstract_;
+
+public class AA extends Template {
+	@Override
+	public void job() {
+		long num = 0;
+		for (int i = 0; i <= 8000000; i++) {
+			num += i;
+		}
+	}
+}
+
+package com.hspedu.abstract_;
+
+public class BB extends Template {
+	@Override
+	public void job() {
+		long num = 0;
+		for (int i = 0; i <= 8000000; i++) {
+			num *= i;
+		}
+	}
+}
+
+package com.hspedu.abstract_;
+
+public class TestTemplate {
+	public static void main(String[] args) {
+		Template aa = new AA();
+		aa.calculateTime();
+		Template bb = new BB();
+		bb.calculateTime();
+	}
+}
+```
+
 #### 接口
 
 **基本介绍：**
@@ -3173,6 +3225,42 @@ class Other {//外部其他类
 7. 如果外部类和局部内部类的成员重名时，默认遵循就近原则，如果想访问外部类的成员，则可以使用（外部类名.this.成员）去访问，如下
    System.out.printIn("外部类的n2 = " + 外部类名.this.n2);
 
+*局部内部类示例代码如下：*
+
+```java
+public class LocalInnerClass {
+	public static void main(String[] args) {
+		Outer02 outer02 = new Outer02();
+		outer02.m1();
+		System.out.println("outer02 的 hashCode = " + outer02);
+	}
+}
+
+class Outer02 {
+	private int n1 = 100;
+	private void m2() {
+		System.out.println("Outer02 m2()");
+	}
+	public void m1() {
+		final class Inner02 {
+            /*
+            	定义在外部类的局部位置，通常在方法
+            	不能添加访问修饰符，但是可以用 final 修饰
+            	作用域：仅仅在定义它的方法或代码块中
+            */
+			private int n1 = 800;
+			public void f1() {
+				System.out.println("n1 = " + n1 + " 外部类的 n1 = " + Outer02.this.n1);
+				System.out.println("Outer02.this hashCode = " + Outer02.this);
+				m2();
+			}
+		}
+		Inner02 inner02 = new Inner02();
+		inner02.f1();
+	}
+}
+```
+
 **匿名内部类的使用：**
 
 - 本质是类
@@ -3228,6 +3316,7 @@ class Outer04 {
 		tiger.cry();
 		tiger.cry();
 		tiger.cry();
+        //返回匿名内部类的对象
 		Father father = new Father("jack") {
 			@Override
 			public void test() {
@@ -3263,6 +3352,317 @@ abstract class Animal {
 	abstract void eat();
 }
 ```
+
+**匿名内部类的最佳实践：**
+
+当做实参直接传递，简洁高效，示例代码如下：
+
+```java
+package com.hspedu.innerclass;
+
+public class InnerClassExercise01 {
+	public static void main(String[] args) {
+		//传统方法
+		f1(new Picture());
+		//直接把匿名内部类当实参传递
+		f1(new IL() {
+			@Override
+			public void show() {
+				System.out.println("这是一幅名画 XX...");
+			}
+		});
+	}
+	public static void f1(IL il) {
+		il.show();
+	}
+}
+
+interface IL {
+	void show();
+}
+//传统方法
+class Picture implements IL {
+	@Override
+	public void show() {
+		System.out.println("这是一幅名画 XX...");
+	}
+}
+```
+
+**成员内部类的使用：**
+
+成员内部类是定义在外部类的成员位置，并且没有**static**修饰
+
+1. 可以直接访问外部类的所有成员，包括私有的
+2. 可以添加任意访问修饰符(public、protected、默认、private==与类相区别==)，因为它的地位就是一个成员
+3. 作用域和外部类的其他成员一样，为整个类体，例如在外部类的成员方法中创建成员内部类对象，再调用方法
+4. 成员内部类 - 访问 - > 外部类成员(比如：属性)，访问方式：直接访问
+5. 外部类 - 访问 - > 成员内部类，访问方式：创建对象，再访问
+6. 外部其他类 - 访问 - > 成员内部类，两种方式：第一种方式，outer08.new Inner08()；相当于把new Inner08()当做是outer08成员；第二种方式，在外部类中，编写一个方法，可以返回Inner08对象。**见下述代码：**
+7. 如果外部类和内部类的成员重名时，内部类访问的话，默认遵循就近原则，如果想访问外部类的成员，则可以使用(外部类名.this.成员)去访问
+
+```java
+public class MemberInnerClass01 {
+    public static void main(String[] args) {
+        Outer08 outer08 = new Outer08();
+        outer08.t1();
+        //外部其他类，使用成员内部类的两种方式
+        //第一种方式，outer08.new Inner08()；相当于把new Inner08()当做是outer08成员
+        Outer08.Inner08 inner08 = outer08.new Inner08();
+        inner08.say();
+        //第二种方式，在外部类中，编写一个方法，可以返回Inner08对象
+        Outer08.Inner08 inner081 = outer08.getInner08Instance();
+        inner081.say();
+    }
+}
+
+class Outer08 {
+    private int n1 = 10;
+    public String name = "张三";
+    private void hi() {
+        System.out.println("hi()方法...");
+    }
+    public class Inner08 {
+        private double sal = 99.8;
+        private int n1 = 66;
+        public void say() {
+            System.out.println("n1 = " + n1 + " name = " + name + " 外部类的 n1 = " + Outer08.this.n1);
+            hi();
+        }
+    }
+
+    public Inner08 getInner08Instance() {
+        return new Inner08();
+    }
+
+    //外部类访问成员内部类
+    public void t1() {
+        //创建成员内部类的对象，再使用相关的方法
+        Inner08 inner08 = new Inner08();
+        inner08.say();
+        System.out.println(inner08.sal);
+    }
+}
+```
+
+**静态内部类的使用：**
+
+静态内部类是定义在外部类的成员位置，并且有static修饰
+
+1. 可以直接访问外部类的所有静态成员，包含私有的，但不能直接访问非静态成员
+2. 可以添加任意访问修饰符(public.protected、默认、private)，因为它的地位就是一个成员
+3. 作用域：同其他的成员，为整个类体
+4. 静态内部类 - 访问 - > 外部类(比如：静态属性) [ 访问方式:直接访问所有静态成员 ]
+5. 外部类 - 访问 - > 静态内部类访问方式：创建对象，再访问
+6. 外部其他类 - 访问 - > 静态内部类，两种方式：方式 1，通过类名创建静态内部类对象；方式 2，编写一个方法，可以返回静态内部类的对象实例。**见下述代码**
+7. 如果外部类和静态内部类的成员重名时，静态内部类访问的时，默认遵循就近原则，如果想访问外部类的成员，则可以使用(外部类名.成员)去访问
+
+```java
+public class StaticInnerClass01 {
+    public static void main(String[] args) {
+        Outer10 outer10 = new Outer10();
+        outer10.m1();
+        //外部其他类访问静态内部类
+        //方式 1,通过类名创建静态内部类对象
+        //注意语法与成员内部类相区别
+        Outer10.Inner10 inner10 = new Outer10.Inner10();
+        inner10.say();
+        //方式 2,编写一个方法，可以返回静态内部类的对象实例
+        Outer10.Inner10 inner10getInstance = outer10.getInner10();
+        inner10getInstance.say();
+
+        Outer10.getInner10_().say();
+    }
+}
+
+class Outer10 {
+    private int n1 = 10;
+    private static String name = "张三";
+    private static void cry() {
+        System.out.println("cry() 方法...");
+    }
+    static class Inner10 {
+        private String name = "韩顺平教育";
+        public void say() {
+            //访问内部类自身成员时，不要求为静态，但是只能访问外部类静态成员
+            System.out.println("name = " + name + " 外部类 name = " + Outer10.name);
+            cry();
+        }
+    }
+
+    public void m1() {
+        Inner10 inner10 = new Inner10();
+        inner10.say();
+    }
+
+    public Inner10 getInner10() {
+        return new Inner10();
+    }
+
+    public static Inner10 getInner10_() {
+        return new Inner10();
+    }
+}
+```
+
+### 第11章 枚举与注解
+
+枚举属于一种特殊的类，里面只包含一组有限的特定的对象。
+
+#### 枚举的两种实现方式
+
+1. 自定义类实现枚举
+2. 使用 enum 关键字实现枚举
+
+#### 自定义类实现枚举 - 应用案例
+
+1. 不提供setXxx方法，因为枚举对象值通常为只读，构造器私有化
+2. 对枚举对象/属性使用final + static共同修饰，实现底层优化
+3. 枚举对象名通常使用全部大写，常量的命名规范
+4. 枚举对象根据需要，也可以有多个属性
+
+*自定义类实现枚举，代码示例如下：*
+
+```java
+public class Enumeration02 {
+    public static void main(String[] args) {
+        System.out.println(Season_.SPRING);
+        System.out.println(Season_.SPRING.getName());
+    }
+}
+
+class Season_ {
+    private String name;
+    private String desc;
+    public static final Season_ SPRING = new Season_("春天", "温暖");
+    public static final Season_ WINTER = new Season_("冬天", "寒冷");
+    public static final Season_ SUMMER = new Season_("夏天", "炎热");
+    public static final Season_ AUTUMN = new Season_("秋天", "凉爽");
+    private Season_(String name, String desc) {
+        this.name = name;
+        this.desc = desc;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    @Override
+    public String toString() {
+        return "Season_{" +
+                "name='" + name + '\'' +
+                ", desc='" + desc + '\'' +
+                '}';
+    }
+}
+```
+
+**自定义类实现枚举 - 小结：**
+
+- 构造器私有化
+- 本类内部创建一组对象[四个 春 夏 秋 冬]
+- 对外暴露对象（通过为对象添加 public final static 修饰符）
+- 可以提供 get 方法，但是不提供 set
+
+#### enum关键字实现枚举
+
+*示例代码如下：*
+
+```java
+public class Enumeration03 {
+    public static void main(String[] args) {
+        System.out.println(Season2.SPRING);
+    }
+}
+
+enum Season2 {
+    SPRING("春天", "温暖"), WINTER("冬天", "寒冷"), AUTUMN("秋天", "凉爽"), SUMMER("夏天", "炎热");
+    private String name;
+    private String desc;
+
+    Season2() {
+
+    }
+
+    private Season2(String name, String desc) {
+        this.name = name;
+        this.desc = desc;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    @Override
+    public String toString() {
+        return "Season2{" +
+                "name='" + name + '\'' +
+                ", desc='" + desc + '\'' +
+                '}';
+    }
+}
+```
+
+**enum关键字实现枚举的注意事项：**
+
+1. 当我们使用 enum 关键字开发一个枚举类时，默认会继承 Enum 类，而且是一个 final 类
+2. 传统的 public static final Season2 SPRING = new Season2("春天", "温暖"); 简化成 SPRING("春天", "温暖")， 这里必须知道，它调用的是哪个构造器
+3. 如果使用无参构造器创建枚举对象，则实参列表和小括号都可以省略
+4. 当有多个枚举对象时，使用,间隔，最后有一个分号结尾
+5. 枚举对象必须放在枚举类的行首
+
+#### enum常用方法应用实例
+
+1) toString：Enum 类已经重写过了，返回的是当前对象名,子类可以重写该方法，用于返回对象的属性信息
+2) name：返回当前对象名（常量名），子类中不能重写
+3) ordinal：返回当前对象的位置号，默认从 0 开始
+4) values：返回当前枚举类中所有的常量
+5) valueOf：将字符串转换成枚举对象，要求字符串必须为已有的常量名，否则报异常
+6) compareTo：比较两个枚举常量，比较的就是编号
+
+#### enum实现接口
+
+- 使用 enum 关键字后，就不能再继承其它类了，因为 enum 会隐式继承 Enum，而 Java 是单继承机制。
+- 枚举类和普通类一样，可以实现接口，如下形式：enum 类名 implements 接口 1, 接口 2{ }
+
+#### 注解的理解
+
+1. 注解(Annotation)也被称为元数据(Metadata)，用于修饰解释 包、类、方法、属性、构造器、局部变量等数据信息。
+2. 和注释一样，注解不影响程序逻辑，但注解可以被编译或运行，相当于嵌入在代码中的补充信息。
+3. 在 JavaSE 中，注解的使用目的比较简单，例如标记过时的功能，忽略警告等。在 JavaEE 中注解占据了更重要的角 色，例如用来配置应用程序的任何切面，代替 java EE 旧版中所遗留的繁冗代码和 XML 配置等。
+
+#### 基本的Annotation介绍
+
+使用 Annotation 时要在其前面增加 @ 符号， 并把该 Annotation 当成一个修饰符使用。用于修饰它支持的程序元素
+
+三个基本的 Annotation：
+
+1. @Override：限定某个方法，是重写父类方法, 该注解只能用于方法 
+2. @Deprecated：用于表示某个程序元素(类, 方法等)已过时
+3. @SuppressWarnings：抑制编译器警告
+
+**@Override使用说明：**
+
+1. @Override表示指定重写父类的方法(从编译层面验证)，如果父类没有fly方法，则会报错
+2. 如果不写@Override 注解，而父类仍有public void fly() {}，仍然构成重写
+3. @Override只能修饰方法，不能修饰其它类，包，属性等等
+4. 查看@Override注解源码为@Target(ElementType.METHOD)，说明只能修饰方法
+5. @Target是修饰注解的注解,称为元注解,记住这个概念
+
+**@Deprecated使用说明：**
+
+1. 用于表示某个程序元素(类,方法等)已过时，但是仍可以使用
+2. 可以修饰方法，类，字段，包，参数等等
+3. @Target(value={CONSTRUCTOR, FIELD, LOCAL_VARIABLE, METHOD, PACKAGE, PARAMETER, TYPE})
+4. @Deprecated的作用可以做到新旧版本的兼容和过渡
 
 ## SSM框架
 
